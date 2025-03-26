@@ -199,7 +199,7 @@ static HttpResponse ProcessRequest(const HttpRequest &req,
                                    const string &base_dir,
                                    const list<string> &indices) {
   if (req.uri() == "/") {
-    return ProcessFileRequest(req.uri(), indices, base_dir);
+    return ProcessQueryRequest(req.uri(), indices, base_dir);
   }
   // Is the user asking for a static file?
   if (StringStartsWith(req.uri(), "/static/")) {
