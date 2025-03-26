@@ -11,6 +11,6 @@
         "visibility": "public"
       }
     },
-    "postCreateCommand": "make"
-  }
+    "postCreateCommand": "bash -c 'make && ./http333d 8000 projdocs unit_test_indices/*'"
+}
   
