@@ -205,9 +205,9 @@ static HttpResponse ProcessRequest(const HttpRequest &req,
   if (StringStartsWith(req.uri(), "/static/")) {
     return ProcessFileRequest(req.uri(), base_dir);
   }
-
   // The user must be asking for a query.
   return ProcessQueryRequest(req.uri(), indices, base_dir);
+
 }
 
 static HttpResponse ProcessFileRequest(const string &uri,
@@ -384,6 +384,7 @@ static HttpResponse ProcessQueryRequest(const string &uri,
 
 
   // Finish up the ret variable
+  ret.set_content_type("text/html");
   ret.set_protocol("HTTP/1.1");
   ret.set_response_code(200);
   ret.set_message("OK");
