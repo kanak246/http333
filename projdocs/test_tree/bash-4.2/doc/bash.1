@@ -9059,4 +9059,860 @@ variable when the shell exits, rather than overwriting the file.
 .TP 8
 .B histreedit
 If set, and
-.B
+.B readline
+is being used, a user is given the opportunity to re-edit a
+failed history substitution.
+.TP 8
+.B histverify
+If set, and 
+.B readline
+is being used, the results of history substitution are not immediately
+passed to the shell parser.  Instead, the resulting line is loaded into
+the \fBreadline\fP editing buffer, allowing further modification.
+.TP 8
+.B hostcomplete
+If set, and
+.B readline
+is being used, \fBbash\fP will attempt to perform hostname completion when a
+word containing a \fB@\fP is being completed (see
+.B Completing
+under
+.SM
+.B READLINE
+above).
+This is enabled by default.
+.TP 8
+.B huponexit
+If set, \fBbash\fP will send
+.SM
+.B SIGHUP
+to all jobs when an interactive login shell exits.
+.TP 8
+.B interactive_comments
+If set, allow a word beginning with
+.B #
+to cause that word and all remaining characters on that
+line to be ignored in an interactive shell (see
+.SM
+.B COMMENTS
+above).  This option is enabled by default.
+.TP 8
+.B lastpipe
+If set, and job control is not active, the shell runs the last command of
+a pipeline not executed in the background in the current shell environment.
+.TP 8
+.B lithist
+If set, and the
+.B cmdhist
+option is enabled, multi-line commands are saved to the history with
+embedded newlines rather than using semicolon separators where possible.
+.TP 8
+.B login_shell
+The shell sets this option if it is started as a login shell (see
+.SM
+.B "INVOCATION"
+above).
+The value may not be changed.
+.TP 8
+.B mailwarn
+If set, and a file that \fBbash\fP is checking for mail has been  
+accessed since the last time it was checked, the message ``The mail in
+\fImailfile\fP has been read'' is displayed.
+.TP 8
+.B no_empty_cmd_completion
+If set, and
+.B readline
+is being used,
+.B bash
+will not attempt to search the
+.SM
+.B PATH
+for possible completions when
+completion is attempted on an empty line.
+.TP 8
+.B nocaseglob
+If set,
+.B bash
+matches filenames in a case\-insensitive fashion when performing pathname
+expansion (see
+.B Pathname Expansion
+above).
+.TP 8
+.B nocasematch
+If set,
+.B bash
+matches patterns in a case\-insensitive fashion when performing matching
+while executing \fBcase\fP or \fB[[\fP conditional commands.
+.TP 8
+.B nullglob
+If set,
+.B bash
+allows patterns which match no
+files (see
+.B Pathname Expansion
+above)
+to expand to a null string, rather than themselves.
+.TP 8
+.B progcomp
+If set, the programmable completion facilities (see
+\fBProgrammable Completion\fP above) are enabled.
+This option is enabled by default.
+.TP 8
+.B promptvars
+If set, prompt strings undergo
+parameter expansion, command substitution, arithmetic
+expansion, and quote removal after being expanded as described in
+.SM
+.B PROMPTING
+above.  This option is enabled by default.
+.TP 8
+.B restricted_shell
+The shell sets this option if it is started in restricted mode (see
+.SM
+.B "RESTRICTED SHELL"
+below).
+The value may not be changed.
+This is not reset when the startup files are executed, allowing
+the startup files to discover whether or not a shell is restricted.
+.TP 8
+.B shift_verbose
+If set, the
+.B shift
+builtin prints an error message when the shift count exceeds the
+number of positional parameters.
+.TP 8
+.B sourcepath
+If set, the
+\fBsource\fP (\fB.\fP) builtin uses the value of
+.SM
+.B PATH
+to find the directory containing the file supplied as an argument.
+This option is enabled by default.
+.TP 8
+.B xpg_echo
+If set, the \fBecho\fP builtin expands backslash-escape sequences
+by default.
+.RE
+.PD
+.TP
+\fBsuspend\fP [\fB\-f\fP]
+Suspend the execution of this shell until it receives a
+.SM
+.B SIGCONT
+signal.  A login shell cannot be suspended; the
+.B \-f
+option can be used to override this and force the suspension.
+The return status is 0 unless the shell is a login shell and
+.B \-f
+is not supplied, or if job control is not enabled.
+.TP
+\fBtest\fP \fIexpr\fP
+.PD 0
+.TP
+\fB[\fP \fIexpr\fP \fB]\fP
+Return a status of 0 or 1 depending on
+the evaluation of the conditional expression
+.IR expr .
+Each operator and operand must be a separate argument.
+Expressions are composed of the primaries described above under
+.SM
+.BR "CONDITIONAL EXPRESSIONS" .
+\fBtest\fP does not accept any options, nor does it accept and ignore
+an argument of \fB\-\-\fP as signifying the end of options.
+.if t .sp 0.5
+.if n .sp 1
+Expressions may be combined using the following operators, listed
+in decreasing order of precedence.
+The evaluation depends on the number of arguments; see below.
+Operator precedence is used when there are five or more arguments.
+.RS
+.PD 0
+.TP
+.B ! \fIexpr\fP
+True if
+.I expr
+is false.
+.TP
+.B ( \fIexpr\fP )
+Returns the value of \fIexpr\fP.
+This may be used to override the normal precedence of operators.
+.TP
+\fIexpr1\fP \-\fBa\fP \fIexpr2\fP
+True if both
+.I expr1
+and
+.I expr2
+are true.
+.TP
+\fIexpr1\fP \-\fBo\fP \fIexpr2\fP
+True if either
+.I expr1
+or
+.I expr2
+is true.
+.PD
+.PP
+\fBtest\fP and \fB[\fP evaluate conditional
+expressions using a set of rules based on the number of arguments.
+.if t .sp 0.5
+.if n .sp 1
+.PD 0
+.TP
+0 arguments
+The expression is false.
+.TP
+1 argument
+The expression is true if and only if the argument is not null.
+.TP
+2 arguments
+If the first argument is \fB!\fP, the expression is true if and
+only if the second argument is null.
+If the first argument is one of the unary conditional operators listed above
+under
+.SM
+.BR "CONDITIONAL EXPRESSIONS" ,
+the expression is true if the unary test is true.
+If the first argument is not a valid unary conditional operator, the expression
+is false.
+.TP
+3 arguments
+The following conditions are applied in the order listed.
+If the second argument is one of the binary conditional operators listed above
+under
+.SM
+.BR "CONDITIONAL EXPRESSIONS" ,
+the result of the expression is the result of the binary test using
+the first and third arguments as operands.
+The \fB\-a\fP and \fB\-o\fP operators are considered binary operators
+when there are three arguments.  
+If the first argument is \fB!\fP, the value is the negation of
+the two-argument test using the second and third arguments.
+If the first argument is exactly \fB(\fP and the third argument is
+exactly \fB)\fP, the result is the one-argument test of the second
+argument.
+Otherwise, the expression is false.
+.TP
+4 arguments
+If the first argument is \fB!\fP, the result is the negation of
+the three-argument expression composed of the remaining arguments.
+Otherwise, the expression is parsed and evaluated according to 
+precedence using the rules listed above.
+.TP
+5 or more arguments
+The expression is parsed and evaluated according to precedence
+using the rules listed above.
+.if t .sp 0.5
+.if n .sp 1
+.LP
+When used with \fBtest\fP or \fB[\fP, the \fB<\fP and \fB>\fP operators
+sort lexicographically using ASCII ordering.
+.RE
+.PD
+.TP
+.B times
+Print the accumulated user and system times for the shell and
+for processes run from the shell.  The return status is 0.
+.TP
+\fBtrap\fP [\fB\-lp\fP] [[\fIarg\fP] \fIsigspec\fP ...]
+The command
+.I arg
+is to be read and executed when the shell receives
+signal(s)
+.IR sigspec .
+If
+.I arg
+is absent (and there is a single \fIsigspec\fP) or
+.BR \- ,
+each specified signal is
+reset to its original disposition (the value it had
+upon entrance to the shell).
+If 
+.I arg
+is the null string the signal specified by each
+.I sigspec
+is ignored by the shell and by the commands it invokes.
+If
+.I arg
+is not present and
+.B \-p
+has been supplied, then the trap commands associated with each
+.I sigspec
+are displayed.
+If no arguments are supplied or if only
+.B \-p
+is given,
+.B trap
+prints the list of commands associated with each signal.
+The
+.B \-l
+option causes the shell to print a list of signal names and
+their corresponding numbers.
+Each
+.I sigspec
+is either
+a signal name defined in <\fIsignal.h\fP>, or a signal number.
+Signal names are case insensitive and the
+.SM
+.B SIG
+prefix is optional.
+.if t .sp 0.5
+.if n .sp 1
+If a
+.I sigspec
+is
+.SM
+.B EXIT
+(0) the command
+.I arg
+is executed on exit from the shell.
+If a
+.I sigspec
+is
+.SM
+.BR DEBUG ,
+the command
+.I arg
+is executed before every \fIsimple command\fP, \fIfor\fP command,
+\fIcase\fP command, \fIselect\fP command, every arithmetic \fIfor\fP
+command, and before the first command executes in a shell function (see
+.SM
+.B SHELL GRAMMAR
+above).
+Refer to the description of the \fBextdebug\fP option to the
+\fBshopt\fP builtin for details of its effect on the \fBDEBUG\fP trap.
+If a
+.I sigspec
+is
+.SM
+.BR RETURN ,
+the command
+.I arg
+is executed each time a shell function or a script executed with
+the \fB.\fP or \fBsource\fP builtins finishes executing.
+.if t .sp 0.5
+.if n .sp 1
+If a
+.I sigspec
+is
+.SM
+.BR ERR ,
+the command
+.I arg
+is executed whenever a simple command has a non\-zero exit status,
+subject to the following conditions.
+The
+.SM
+.B ERR
+trap is not executed if the failed
+command is part of the command list immediately following a
+.B while
+or
+.B until
+keyword, 
+part of the test in an
+.I if
+statement, part of a command executed in a
+.B &&
+or
+.B ||
+list, or if the command's return value is
+being inverted via
+.BR ! .
+These are the same conditions obeyed by the \fBerrexit\fP option.
+.if t .sp 0.5
+.if n .sp 1
+Signals ignored upon entry to the shell cannot be trapped or reset.
+Trapped signals that are not being ignored are reset to their original
+values in a subshell or subshell environment when one is created.
+The return status is false if any
+.I sigspec
+is invalid; otherwise
+.B trap
+returns true.
+.TP
+\fBtype\fP [\fB\-aftpP\fP] \fIname\fP [\fIname\fP ...]
+With no options, 
+indicate how each
+.I name
+would be interpreted if used as a command name.
+If the
+.B \-t
+option is used,
+.B type
+prints a string which is one of
+.IR alias ,
+.IR keyword ,
+.IR function ,
+.IR builtin ,
+or
+.I file 
+if
+.I name
+is an alias, shell reserved word, function, builtin, or disk file,
+respectively.
+If the
+.I name
+is not found, then nothing is printed, and an exit status of false
+is returned.
+If the
+.B \-p
+option is used,
+.B type
+either returns the name of the disk file
+that would be executed if
+.I name
+were specified as a command name,
+or nothing if
+.if t \f(CWtype -t name\fP
+.if n ``type -t name''
+would not return
+.IR file .
+The
+.B \-P
+option forces a
+.SM
+.B PATH
+search for each \fIname\fP, even if
+.if t \f(CWtype -t name\fP
+.if n ``type -t name''
+would not return
+.IR file .
+If a command is hashed,
+.B \-p
+and
+.B \-P
+print the hashed value, not necessarily the file that appears
+first in 
+.SM
+.BR PATH .
+If the
+.B \-a
+option is used, 
+.B type
+prints all of the places that contain
+an executable named 
+.IR name .
+This includes aliases and functions,
+if and only if the 
+.B \-p
+option is not also used.
+The table of hashed commands is not consulted
+when using
+.BR \-a .
+The
+.B \-f
+option suppresses shell function lookup, as with the \fBcommand\fP builtin.
+.B type
+returns true if all of the arguments are found, false if
+any are not found.
+.TP
+\fBulimit\fP [\fB\-HSTabcdefilmnpqrstuvx\fP [\fIlimit\fP]]
+Provides control over the resources available to the shell and to
+processes started by it, on systems that allow such control.
+The \fB\-H\fP and \fB\-S\fP options specify that the hard or soft limit is
+set for the given resource.
+A hard limit cannot be increased by a non-root user once it is set;
+a soft limit may be increased up to the value of the hard limit.
+If neither \fB\-H\fP nor \fB\-S\fP is specified, both the soft and hard
+limits are set.
+The value of
+.I limit
+can be a number in the unit specified for the resource
+or one of the special values
+.BR hard ,
+.BR soft ,
+or
+.BR unlimited ,
+which stand for the current hard limit, the current soft limit, and
+no limit, respectively.
+If
+.I limit
+is omitted, the current value of the soft limit of the resource is
+printed, unless the \fB\-H\fP option is given.  When more than one
+resource is specified, the limit name and unit are printed before the value.
+Other options are interpreted as follows:
+.RS
+.PD 0
+.TP
+.B \-a
+All current limits are reported
+.TP
+.B \-b
+The maximum socket buffer size
+.TP
+.B \-c
+The maximum size of core files created
+.TP
+.B \-d
+The maximum size of a process's data segment
+.TP
+.B \-e
+The maximum scheduling priority ("nice")
+.TP
+.B \-f
+The maximum size of files written by the shell and its children
+.TP
+.B \-i
+The maximum number of pending signals
+.TP
+.B \-l
+The maximum size that may be locked into memory
+.TP
+.B \-m
+The maximum resident set size (many systems do not honor this limit)
+.TP
+.B \-n
+The maximum number of open file descriptors (most systems do not
+allow this value to be set)
+.TP
+.B \-p
+The pipe size in 512-byte blocks (this may not be set)
+.TP
+.B \-q
+The maximum number of bytes in POSIX message queues
+.TP
+.B \-r
+The maximum real-time scheduling priority
+.TP
+.B \-s
+The maximum stack size
+.TP
+.B \-t
+The maximum amount of cpu time in seconds
+.TP
+.B \-u
+The maximum number of processes available to a single user
+.TP
+.B \-v
+The maximum amount of virtual memory available to the shell and, on
+some systems, to its children
+.TP
+.B \-x
+The maximum number of file locks
+.TP
+.B \-T
+The maximum number of threads
+.PD
+.PP
+If
+.I limit
+is given, it is the new value of the specified resource (the
+.B \-a
+option is display only).
+If no option is given, then
+.B \-f
+is assumed.  Values are in 1024-byte increments, except for
+.BR \-t ,
+which is in seconds,
+.BR \-p ,
+which is in units of 512-byte blocks,
+and
+.BR \-T ,
+.BR \-b ,
+.BR \-n ,
+and
+.BR \-u ,
+which are unscaled values.
+The return status is 0 unless an invalid option or argument is supplied,
+or an error occurs while setting a new limit.
+.RE
+.TP
+\fBumask\fP [\fB\-p\fP] [\fB\-S\fP] [\fImode\fP]
+The user file-creation mask is set to 
+.IR mode .
+If
+.I mode
+begins with a digit, it
+is interpreted as an octal number; otherwise
+it is interpreted as a symbolic mode mask similar
+to that accepted by
+.IR chmod (1).
+If
+.I mode
+is omitted, the current value of the mask is printed.
+The
+.B \-S
+option causes the mask to be printed in symbolic form; the
+default output is an octal number.
+If the
+.B \-p
+option is supplied, and
+.I mode
+is omitted, the output is in a form that may be reused as input.
+The return status is 0 if the mode was successfully changed or if
+no \fImode\fP argument was supplied, and false otherwise.
+.TP
+\fBunalias\fP [\-\fBa\fP] [\fIname\fP ...]
+Remove each \fIname\fP from the list of defined aliases.  If
+.B \-a
+is supplied, all alias definitions are removed.  The return
+value is true unless a supplied
+.I name
+is not a defined alias.
+.TP
+\fBunset\fP [\-\fBfv\fP] [\fIname\fP ...]
+For each
+.IR name ,
+remove the corresponding variable or function.
+If no options are supplied, or the
+.B \-v
+option is given, each
+.I name
+refers to a shell variable.
+Read-only variables may not be unset.
+If
+.B \-f
+is specified, each
+.I name
+refers to a shell function, and the function definition
+is removed.
+Each unset variable or function is removed from the environment
+passed to subsequent commands.
+If any of
+.SM
+.BR COMP_WORDBREAKS ,
+.SM
+.BR RANDOM ,
+.SM
+.BR SECONDS ,
+.SM
+.BR LINENO ,
+.SM
+.BR HISTCMD ,
+.SM
+.BR FUNCNAME ,
+.SM
+.BR GROUPS ,
+or
+.SM
+.B DIRSTACK
+are unset, they lose their special properties, even if they are
+subsequently reset.  The exit status is true unless a
+.I name
+is readonly.
+.TP
+\fBwait\fP [\fIn ...\fP]
+Wait for each specified process and return its termination status.
+Each
+.I n
+may be a process
+ID or a job specification; if a job spec is given, all processes
+in that job's pipeline are waited for.  If
+.I n
+is not given, all currently active child processes
+are waited for, and the return status is zero.  If
+.I n
+specifies a non-existent process or job, the return status is
+127.  Otherwise, the return status is the exit status of the last
+process or job waited for.
+.\" bash_builtins
+.if \n(zZ=1 .ig zZ
+.SH "RESTRICTED SHELL"
+.\" rbash.1
+.zY
+.PP
+If
+.B bash
+is started with the name
+.BR rbash ,
+or the
+.B \-r
+option is supplied at invocation,
+the shell becomes restricted.
+A restricted shell is used to
+set up an environment more controlled than the standard shell.
+It behaves identically to
+.B bash
+with the exception that the following are disallowed or not performed:
+.IP \(bu
+changing directories with \fBcd\fP
+.IP \(bu
+setting or unsetting the values of
+.SM
+.BR SHELL ,
+.SM
+.BR PATH ,
+.SM
+.BR ENV ,
+or
+.SM
+.B BASH_ENV
+.IP \(bu
+specifying command names containing
+.B /
+.IP \(bu
+specifying a file name containing a
+.B /
+as an argument to the
+.B .
+builtin command
+.IP \(bu
+specifying a filename containing a slash as an argument to the
+.B \-p
+option to the
+.B hash
+builtin command
+.IP \(bu
+importing function definitions from the shell environment at startup
+.IP \(bu
+parsing the value of
+.SM
+.B SHELLOPTS
+from the shell environment at startup
+.IP \(bu
+redirecting output using the >, >|, <>, >&, &>, and >> redirection operators
+.IP \(bu
+using the
+.B exec
+builtin command to replace the shell with another command
+.IP \(bu
+adding or deleting builtin commands with the
+.B \-f
+and
+.B \-d
+options to the
+.B enable
+builtin command
+.IP \(bu
+using the \fBenable\fP builtin command to enable disabled shell builtins
+.IP \(bu
+specifying the
+.B \-p
+option to the
+.B command
+builtin command
+.IP \(bu
+turning off restricted mode with
+\fBset +r\fP or \fBset +o restricted\fP.
+.PP
+These restrictions are enforced after any startup files are read.
+.PP
+.ie \n(zY=1 When a command that is found to be a shell script is executed,
+.el \{ When a command that is found to be a shell script is executed
+(see
+.SM
+.B "COMMAND EXECUTION"
+above),
+\}
+.B rbash
+turns off any restrictions in the shell spawned to execute the
+script.
+.\" end of rbash.1
+.if \n(zY=1 .ig zY
+.SH "SEE ALSO"
+.PD 0
+.TP
+\fIBash Reference Manual\fP, Brian Fox and Chet Ramey
+.TP
+\fIThe Gnu Readline Library\fP, Brian Fox and Chet Ramey
+.TP
+\fIThe Gnu History Library\fP, Brian Fox and Chet Ramey
+.TP
+\fIPortable Operating System Interface (POSIX) Part 2: Shell and Utilities\fP, IEEE
+.TP
+\fIsh\fP(1), \fIksh\fP(1), \fIcsh\fP(1)
+.TP
+\fIemacs\fP(1), \fIvi\fP(1)
+.TP
+\fIreadline\fP(3)
+.PD
+.SH FILES
+.PD 0
+.TP
+.FN /bin/bash
+The \fBbash\fP executable
+.TP
+.FN /etc/profile
+The systemwide initialization file, executed for login shells
+.TP
+.FN ~/.bash_profile
+The personal initialization file, executed for login shells
+.TP
+.FN ~/.bashrc
+The individual per-interactive-shell startup file
+.TP
+.FN ~/.bash_logout
+The individual login shell cleanup file, executed when a login shell exits
+.TP
+.FN ~/.inputrc
+Individual \fIreadline\fP initialization file
+.PD
+.SH AUTHORS
+Brian Fox, Free Software Foundation
+.br
+bfox@gnu.org
+.PP
+Chet Ramey, Case Western Reserve University
+.br
+chet.ramey@case.edu
+.SH BUG REPORTS
+If you find a bug in
+.B bash,
+you should report it.  But first, you should
+make sure that it really is a bug, and that it appears in the latest
+version of
+.BR bash .
+The latest version is always available from
+\fIftp://ftp.gnu.org/pub/gnu/bash/\fP.
+.PP
+Once you have determined that a bug actually exists, use the
+.I bashbug
+command to submit a bug report.
+If you have a fix, you are encouraged to mail that as well!
+Suggestions and `philosophical' bug reports may be mailed
+to \fIbug-bash@gnu.org\fP or posted to the Usenet
+newsgroup
+.BR gnu.bash.bug .
+.PP
+ALL bug reports should include:
+.PP
+.PD 0
+.TP 20
+The version number of \fBbash\fR
+.TP
+The hardware and operating system
+.TP
+The compiler used to compile
+.TP
+A description of the bug behaviour
+.TP
+A short script or `recipe' which exercises the bug
+.PD
+.PP
+.I bashbug
+inserts the first three items automatically into the template
+it provides for filing a bug report.
+.PP
+Comments and bug reports concerning
+this manual page should be directed to
+.IR chet.ramey@case.edu .
+.SH BUGS
+.PP
+It's too big and too slow.
+.PP
+There are some subtle differences between 
+.B bash
+and traditional versions of
+.BR sh ,
+mostly because of the
+.SM
+.B POSIX
+specification.
+.PP
+Aliases are confusing in some uses.
+.PP
+Shell builtin commands and functions are not stoppable/restartable.
+.PP
+Compound commands and command sequences of the form `a ; b ; c'
+are not handled gracefully when process suspension is attempted.
+When a process is stopped, the shell immediately executes the next
+command in the sequence.
+It suffices to place the sequence of commands between
+parentheses to force it into a subshell, which may be stopped as
+a unit.
+.PP
+Array variables may not (yet) be exported.
+.PP
+There may be only one active coprocess at a time.
+.zZ
+.zY

@@ -198,6 +198,9 @@ static void HttpServer_ThrFn(ThreadPool::Task *t) {
 static HttpResponse ProcessRequest(const HttpRequest &req,
                                    const string &base_dir,
                                    const list<string> &indices) {
+  if (req.uri() == "/") {
+    return ProcessFileRequest("/static/index.html", base_dir);
+  }
   // Is the user asking for a static file?
   if (StringStartsWith(req.uri(), "/static/")) {
     return ProcessFileRequest(req.uri(), base_dir);

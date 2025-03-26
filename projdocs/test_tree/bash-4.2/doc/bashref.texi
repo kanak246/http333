@@ -7191,4 +7191,977 @@ Optionally, type @samp{make tests} to run the Bash test suite.
 Type @samp{make install} to install @code{bash} and @code{bashbug}.
 This will also install the manual pages and Info file.
 
-@end enume
+@end enumerate
+
+The @code{configure} shell script attempts to guess correct
+values for various system-dependent variables used during
+compilation.  It uses those values to create a @file{Makefile} in
+each directory of the package (the top directory, the
+@file{builtins}, @file{doc}, and @file{support} directories,
+each directory under @file{lib}, and several others).  It also creates a
+@file{config.h} file containing system-dependent definitions. 
+Finally, it creates a shell script named @code{config.status} that you
+can run in the future to recreate the current configuration, a
+file @file{config.cache} that saves the results of its tests to
+speed up reconfiguring, and a file @file{config.log} containing
+compiler output (useful mainly for debugging @code{configure}). 
+If at some point
+@file{config.cache} contains results you don't want to keep, you
+may remove or edit it. 
+
+To find out more about the options and arguments that the
+@code{configure} script understands, type 
+
+@example
+bash-2.04$ ./configure --help
+@end example
+
+@noindent
+at the Bash prompt in your Bash source directory.
+
+If you need to do unusual things to compile Bash, please
+try to figure out how @code{configure} could check whether or not
+to do them, and mail diffs or instructions to
+@email{bash-maintainers@@gnu.org} so they can be
+considered for the next release.
+
+The file @file{configure.in} is used to create @code{configure}
+by a program called Autoconf.  You only need
+@file{configure.in} if you want to change it or regenerate
+@code{configure} using a newer version of Autoconf.  If
+you do this, make sure you are using Autoconf version 2.50 or
+newer.
+
+You can remove the program binaries and object files from the
+source code directory by typing @samp{make clean}.  To also remove the
+files that @code{configure} created (so you can compile Bash for
+a different kind of computer), type @samp{make distclean}.
+
+@node Compilers and Options
+@section Compilers and Options
+
+Some systems require unusual options for compilation or linking
+that the @code{configure} script does not know about.  You can
+give @code{configure} initial values for variables by setting
+them in the environment.  Using a Bourne-compatible shell, you
+can do that on the command line like this:
+
+@example
+CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
+@end example
+
+On systems that have the @code{env} program, you can do it like this:
+
+@example
+env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
+@end example
+
+The configuration process uses GCC to build Bash if it
+is available.
+
+@node Compiling For Multiple Architectures
+@section Compiling For Multiple Architectures
+
+You can compile Bash for more than one kind of computer at the
+same time, by placing the object files for each architecture in their
+own directory.  To do this, you must use a version of @code{make} that
+supports the @code{VPATH} variable, such as GNU @code{make}.
+@code{cd} to the
+directory where you want the object files and executables to go and run
+the @code{configure} script from the source directory.  You may need to
+supply the @option{--srcdir=PATH} argument to tell @code{configure} where the
+source files are.  @code{configure} automatically checks for the
+source code in the directory that @code{configure} is in and in `..'.
+
+If you have to use a @code{make} that does not supports the @code{VPATH}
+variable, you can compile Bash for one architecture at a
+time in the source code directory.  After you have installed
+Bash for one architecture, use @samp{make distclean} before
+reconfiguring for another architecture.
+
+Alternatively, if your system supports symbolic links, you can use the
+@file{support/mkclone} script to create a build tree which has
+symbolic links back to each file in the source directory.  Here's an
+example that creates a build directory in the current directory from a
+source directory @file{/usr/gnu/src/bash-2.0}:
+
+@example
+bash /usr/gnu/src/bash-2.0/support/mkclone -s /usr/gnu/src/bash-2.0 .
+@end example
+
+@noindent
+The @code{mkclone} script requires Bash, so you must have already built
+Bash for at least one architecture before you can create build
+directories for other architectures.
+
+@node Installation Names
+@section Installation Names
+
+By default, @samp{make install} will install into
+@file{/usr/local/bin}, @file{/usr/local/man}, etc.  You can
+specify an installation prefix other than @file{/usr/local} by
+giving @code{configure} the option @option{--prefix=@var{PATH}},
+or by specifying a value for the @code{DESTDIR} @samp{make}
+variable when running @samp{make install}.
+
+You can specify separate installation prefixes for
+architecture-specific files and architecture-independent files. 
+If you give @code{configure} the option
+@option{--exec-prefix=@var{PATH}}, @samp{make install} will use
+@var{PATH} as the prefix for installing programs and libraries.
+Documentation and other data files will still use the regular prefix. 
+
+@node Specifying the System Type
+@section Specifying the System Type
+
+There may be some features @code{configure} can not figure out
+automatically, but need to determine by the type of host Bash
+will run on.  Usually @code{configure} can figure that
+out, but if it prints a message saying it can not guess the host
+type, give it the @option{--host=TYPE} option.  @samp{TYPE} can
+either be a short name for the system type, such as @samp{sun4},
+or a canonical name with three fields: @samp{CPU-COMPANY-SYSTEM}
+(e.g., @samp{i386-unknown-freebsd4.2}).
+
+See the file @file{support/config.sub} for the possible
+values of each field. 
+
+@node Sharing Defaults
+@section Sharing Defaults
+
+If you want to set default values for @code{configure} scripts to
+share, you can create a site shell script called
+@code{config.site} that gives default values for variables like
+@code{CC}, @code{cache_file}, and @code{prefix}.  @code{configure}
+looks for @file{PREFIX/share/config.site} if it exists, then
+@file{PREFIX/etc/config.site} if it exists.  Or, you can set the
+@code{CONFIG_SITE} environment variable to the location of the site
+script.  A warning: the Bash @code{configure} looks for a site script,
+but not all @code{configure} scripts do.
+
+@node Operation Controls
+@section Operation Controls
+
+@code{configure} recognizes the following options to control how it
+operates.
+
+@table @code
+
+@item --cache-file=@var{file}
+Use and save the results of the tests in
+@var{file} instead of @file{./config.cache}.  Set @var{file} to
+@file{/dev/null} to disable caching, for debugging
+@code{configure}. 
+
+@item --help
+Print a summary of the options to @code{configure}, and exit.
+
+@item --quiet
+@itemx --silent
+@itemx -q
+Do not print messages saying which checks are being made.
+
+@item --srcdir=@var{dir}
+Look for the Bash source code in directory @var{dir}.  Usually
+@code{configure} can determine that directory automatically.
+
+@item --version
+Print the version of Autoconf used to generate the @code{configure}
+script, and exit.
+@end table
+
+@code{configure} also accepts some other, not widely used, boilerplate
+options.  @samp{configure --help} prints the complete list.
+
+@node Optional Features
+@section Optional Features
+
+The Bash @code{configure} has a number of @option{--enable-@var{feature}}
+options, where @var{feature} indicates an optional part of Bash.
+There are also several @option{--with-@var{package}} options,
+where @var{package} is something like @samp{bash-malloc} or @samp{purify}.
+To turn off the default use of a package, use
+@option{--without-@var{package}}.  To configure Bash without a feature
+that is enabled by default, use @option{--disable-@var{feature}}.
+
+Here is a complete list of the @option{--enable-} and
+@option{--with-} options that the Bash @code{configure} recognizes. 
+
+@table @code
+@item --with-afs
+Define if you are using the Andrew File System from Transarc.
+
+@item --with-bash-malloc
+Use the Bash version of
+@code{malloc} in the directory @file{lib/malloc}.  This is not the same
+@code{malloc} that appears in @sc{gnu} libc, but an older version
+originally derived from the 4.2 @sc{bsd} @code{malloc}.  This @code{malloc}
+is very fast, but wastes some space on each allocation.
+This option is enabled by default.
+The @file{NOTES} file contains a list of systems for
+which this should be turned off, and @code{configure} disables this
+option automatically for a number of systems.
+
+@item --with-curses
+Use the curses library instead of the termcap library.  This should
+be supplied if your system has an inadequate or incomplete termcap
+database.
+
+@item --with-gnu-malloc
+A synonym for @code{--with-bash-malloc}.
+
+@item --with-installed-readline[=@var{PREFIX}]
+Define this to make Bash link with a locally-installed version of Readline
+rather than the version in @file{lib/readline}.  This works only with
+Readline 5.0 and later versions.  If @var{PREFIX} is @code{yes} or not
+supplied, @code{configure} uses the values of the make variables
+@code{includedir} and @code{libdir}, which are subdirectories of @code{prefix}
+by default, to find the installed version of Readline if it is not in
+the standard system include and library directories.
+If @var{PREFIX} is @code{no}, Bash links with the version in
+@file{lib/readline}.
+If @var{PREFIX} is set to any other value, @code{configure} treats it as
+a directory pathname and looks for
+the installed version of Readline in subdirectories of that directory
+(include files in @var{PREFIX}/@code{include} and the library in
+@var{PREFIX}/@code{lib}).
+
+@item --with-purify
+Define this to use the Purify memory allocation checker from Rational
+Software.
+
+@item --enable-minimal-config
+This produces a shell with minimal features, close to the historical
+Bourne shell.
+@end table
+
+There are several @option{--enable-} options that alter how Bash is
+compiled and linked, rather than changing run-time features.
+
+@table @code
+@item --enable-largefile
+Enable support for @uref{http://www.sas.com/standards/large_file/x_open.20Mar96.html,
+large files} if the operating system requires special compiler options
+to build programs which can access large files.  This is enabled by
+default, if the operating system provides large file support.
+
+@item --enable-profiling
+This builds a Bash binary that produces profiling information to be
+processed by @code{gprof} each time it is executed.
+
+@item --enable-static-link
+This causes Bash to be linked statically, if @code{gcc} is being used.
+This could be used to build a version to use as root's shell.
+@end table
+
+The @samp{minimal-config} option can be used to disable all of
+the following options, but it is processed first, so individual
+options may be enabled using @samp{enable-@var{feature}}. 
+
+All of the following options except for @samp{disabled-builtins} and
+@samp{xpg-echo-default} are
+enabled by default, unless the operating system does not provide the
+necessary support.
+
+@table @code
+@item --enable-alias
+Allow alias expansion and include the @code{alias} and @code{unalias}
+builtins (@pxref{Aliases}).
+
+@item --enable-arith-for-command
+Include support for the alternate form of the @code{for} command
+that behaves like the C language @code{for} statement
+(@pxref{Looping Constructs}).
+
+@item --enable-array-variables
+Include support for one-dimensional array shell variables
+(@pxref{Arrays}).
+
+@item --enable-bang-history
+Include support for @code{csh}-like history substitution
+(@pxref{History Interaction}).
+
+@item --enable-brace-expansion
+Include @code{csh}-like brace expansion
+( @code{b@{a,b@}c} @expansion{} @code{bac bbc} ).
+See @ref{Brace Expansion}, for a complete description.
+
+@item --enable-casemod-attributes
+Include support for case-modifying attributes in the @code{declare} builtin
+and assignment statements.  Variables with the @var{uppercase} attribute,
+for example, will have their values converted to uppercase upon assignment.
+
+@item --enable-casemod-expansion
+Include support for case-modifying word expansions.
+
+@item --enable-command-timing
+Include support for recognizing @code{time} as a reserved word and for
+displaying timing statistics for the pipeline following @code{time}
+(@pxref{Pipelines}).
+This allows pipelines as well as shell builtins and functions to be timed.
+
+@item --enable-cond-command
+Include support for the @code{[[} conditional command.
+(@pxref{Conditional Constructs}).
+
+@item --enable-cond-regexp
+Include support for matching @sc{posix} regular expressions using the
+@samp{=~} binary operator in the @code{[[} conditional command.
+(@pxref{Conditional Constructs}).
+
+@item --enable-coprocesses
+Include support for coprocesses and the @code{coproc} reserved word
+(@pxref{Pipelines}).
+
+@item --enable-debugger
+Include support for the bash debugger (distributed separately).
+
+@item --enable-directory-stack
+Include support for a @code{csh}-like directory stack and the
+@code{pushd}, @code{popd}, and @code{dirs} builtins
+(@pxref{The Directory Stack}).
+
+@item --enable-disabled-builtins
+Allow builtin commands to be invoked via @samp{builtin xxx}
+even after @code{xxx} has been disabled using @samp{enable -n xxx}.
+See @ref{Bash Builtins}, for details of the @code{builtin} and
+@code{enable} builtin commands.
+
+@item --enable-dparen-arithmetic
+Include support for the @code{((@dots{}))} command
+(@pxref{Conditional Constructs}).
+
+@item --enable-extended-glob
+Include support for the extended pattern matching features described
+above under @ref{Pattern Matching}.
+
+@item --enable-extended-glob-default
+Set the default value of the @var{extglob} shell option described
+above under @ref{The Shopt Builtin} to be enabled.
+
+@item --enable-help-builtin
+Include the @code{help} builtin, which displays help on shell builtins and
+variables (@pxref{Bash Builtins}).
+
+@item --enable-history
+Include command history and the @code{fc} and @code{history}
+builtin commands (@pxref{Bash History Facilities}).
+
+@item --enable-job-control
+This enables the job control features (@pxref{Job Control}),
+if the operating system supports them.
+
+@item --enable-multibyte
+This enables support for multibyte characters if the operating
+system provides the necessary support.
+
+@item --enable-net-redirections
+This enables the special handling of filenames of the form
+@code{/dev/tcp/@var{host}/@var{port}} and
+@code{/dev/udp/@var{host}/@var{port}}
+when used in redirections (@pxref{Redirections}).
+
+@item --enable-process-substitution
+This enables process substitution (@pxref{Process Substitution}) if
+the operating system provides the necessary support.
+
+@item --enable-progcomp
+Enable the programmable completion facilities
+(@pxref{Programmable Completion}).
+If Readline is not enabled, this option has no effect.
+
+@item --enable-prompt-string-decoding
+Turn on the interpretation of a number of backslash-escaped characters
+in the @env{$PS1}, @env{$PS2}, @env{$PS3}, and @env{$PS4} prompt
+strings.  See @ref{Printing a Prompt}, for a complete list of prompt
+string escape sequences.
+
+@item --enable-readline
+Include support for command-line editing and history with the Bash
+version of the Readline library (@pxref{Command Line Editing}).
+
+@item --enable-restricted
+Include support for a @dfn{restricted shell}.  If this is enabled, Bash,
+when called as @code{rbash}, enters a restricted mode.  See
+@ref{The Restricted Shell}, for a description of restricted mode.
+
+@item --enable-select
+Include the @code{select} compound command, which allows the generation of
+simple menus (@pxref{Conditional Constructs}).
+
+@item --enable-separate-helpfiles
+Use external files for the documentation displayed by the @code{help} builtin
+instead of storing the text internally.
+
+@item --enable-single-help-strings
+Store the text displayed by the @code{help} builtin as a single string for
+each help topic.  This aids in translating the text to different languages.
+You may need to disable this if your compiler cannot handle very long string
+literals.
+
+@item --enable-strict-posix-default
+Make Bash @sc{posix}-conformant by default (@pxref{Bash POSIX Mode}).
+
+@item --enable-usg-echo-default
+A synonym for @code{--enable-xpg-echo-default}.
+
+@item --enable-xpg-echo-default
+Make the @code{echo} builtin expand backslash-escaped characters by default,
+without requiring the @option{-e} option.
+This sets the default value of the @code{xpg_echo} shell option to @code{on},
+which makes the Bash @code{echo} behave more like the version specified in
+the Single Unix Specification, version 3.
+@xref{Bash Builtins}, for a description of the escape sequences that
+@code{echo} recognizes.
+
+@end table
+
+The file @file{config-top.h} contains C Preprocessor
+@samp{#define} statements for options which are not settable from
+@code{configure}.
+Some of these are not meant to be changed; beware of the consequences if
+you do.
+Read the comments associated with each definition for more
+information about its effect.
+
+@node Reporting Bugs
+@appendix Reporting Bugs
+
+Please report all bugs you find in Bash.
+But first, you should
+make sure that it really is a bug, and that it appears in the latest
+version of Bash.
+The latest version of Bash is always available for FTP from
+@uref{ftp://ftp.gnu.org/pub/gnu/bash/}.
+
+Once you have determined that a bug actually exists, use the
+@code{bashbug} command to submit a bug report.
+If you have a fix, you are encouraged to mail that as well!
+Suggestions and `philosophical' bug reports may be mailed
+to @email{bug-bash@@gnu.org} or posted to the Usenet
+newsgroup @code{gnu.bash.bug}.
+
+All bug reports should include:
+@itemize @bullet
+@item
+The version number of Bash.
+@item
+The hardware and operating system.
+@item
+The compiler used to compile Bash.
+@item
+A description of the bug behaviour.
+@item
+A short script or `recipe' which exercises the bug and may be used
+to reproduce it.
+@end itemize
+
+@noindent
+@code{bashbug} inserts the first three items automatically into
+the template it provides for filing a bug report.
+
+Please send all reports concerning this manual to
+@email{chet.ramey@@case.edu}.
+
+@node Major Differences From The Bourne Shell
+@appendix Major Differences From The Bourne Shell
+
+Bash implements essentially the same grammar, parameter and
+variable expansion, redirection, and quoting as the Bourne Shell. 
+Bash uses the @sc{posix} standard as the specification of
+how these features are to be implemented.  There are some
+differences between the traditional Bourne shell and Bash; this
+section quickly details the differences of significance.  A
+number of these differences are explained in greater depth in
+previous sections.
+This section uses the version of @code{sh} included in SVR4.2 (the
+last version of the historical Bourne shell) as the baseline reference.
+
+@itemize @bullet
+
+@item
+Bash is @sc{posix}-conformant, even where the @sc{posix} specification
+differs from traditional @code{sh} behavior (@pxref{Bash POSIX Mode}).
+
+@item
+Bash has multi-character invocation options (@pxref{Invoking Bash}).
+
+@item
+Bash has command-line editing (@pxref{Command Line Editing}) and
+the @code{bind} builtin.
+
+@item
+Bash provides a programmable word completion mechanism
+(@pxref{Programmable Completion}), and builtin commands
+@code{complete}, @code{compgen}, and @code{compopt}, to
+manipulate it.
+
+@item
+Bash has command history (@pxref{Bash History Facilities}) and the
+@code{history} and @code{fc} builtins to manipulate it.
+The Bash history list maintains timestamp information and uses the
+value of the @code{HISTTIMEFORMAT} variable to display it.
+
+@item
+Bash implements @code{csh}-like history expansion
+(@pxref{History Interaction}).
+
+@item
+Bash has one-dimensional array variables (@pxref{Arrays}), and the
+appropriate variable expansions and assignment syntax to use them.
+Several of the Bash builtins take options to act on arrays.
+Bash provides a number of built-in array variables.
+
+@item
+The @code{$'@dots{}'} quoting syntax, which expands ANSI-C
+backslash-escaped characters in the text between the single quotes,
+is supported (@pxref{ANSI-C Quoting}).
+
+@item
+Bash supports the @code{$"@dots{}"} quoting syntax to do
+locale-specific translation of the characters between the double
+quotes.  The @option{-D}, @option{--dump-strings}, and @option{--dump-po-strings}
+invocation options list the translatable strings found in a script
+(@pxref{Locale Translation}).
+
+@item
+Bash implements the @code{!} keyword to negate the return value of
+a pipeline (@pxref{Pipelines}).
+Very useful when an @code{if} statement needs to act only if a test fails.
+The Bash @samp{-o pipefail} option to @code{set} will cause a pipeline to
+return a failure status if any command fails.
+
+@item
+Bash has the @code{time} reserved word and command timing (@pxref{Pipelines}).
+The display of the timing statistics may be controlled with the
+@env{TIMEFORMAT} variable.
+
+@item
+Bash implements the @code{for (( @var{expr1} ; @var{expr2} ; @var{expr3} ))}
+arithmetic for command, similar to the C language (@pxref{Looping Constructs}).
+
+@item
+Bash includes the @code{select} compound command, which allows the
+generation of simple menus (@pxref{Conditional Constructs}).
+
+@item
+Bash includes the @code{[[} compound command, which makes conditional
+testing part of the shell grammar (@pxref{Conditional Constructs}), including
+optional regular expression matching.
+
+@item
+Bash provides optional case-insensitive matching for the @code{case} and
+@code{[[} constructs.
+
+@item
+Bash includes brace expansion (@pxref{Brace Expansion}) and tilde
+expansion (@pxref{Tilde Expansion}).
+
+@item
+Bash implements command aliases and the @code{alias} and @code{unalias}
+builtins (@pxref{Aliases}).
+
+@item
+Bash provides shell arithmetic, the @code{((} compound command
+(@pxref{Conditional Constructs}),
+and arithmetic expansion (@pxref{Shell Arithmetic}).
+
+@item
+Variables present in the shell's initial environment are automatically
+exported to child processes.  The Bourne shell does not normally do
+this unless the variables are explicitly marked using the @code{export}
+command.
+
+@item
+Bash supports the @samp{+=} assignment operator, which appends to the value
+of the variable named on the left hand side.
+
+@item
+Bash includes the @sc{posix} pattern removal @samp{%}, @samp{#}, @samp{%%}
+and @samp{##} expansions to remove leading or trailing substrings from
+variable values (@pxref{Shell Parameter Expansion}).
+
+@item
+The expansion @code{$@{#xx@}}, which returns the length of @code{$@{xx@}},
+is supported (@pxref{Shell Parameter Expansion}).
+
+@item
+The expansion @code{$@{var:}@var{offset}@code{[:}@var{length}@code{]@}},
+which expands to the substring of @code{var}'s value of length
+@var{length}, beginning at @var{offset}, is present
+(@pxref{Shell Parameter Expansion}).
+
+@item
+The expansion
+@code{$@{var/[/]}@var{pattern}@code{[/}@var{replacement}@code{]@}},
+which matches @var{pattern} and replaces it with @var{replacement} in
+the value of @code{var}, is available (@pxref{Shell Parameter Expansion}).
+
+@item
+The expansion @code{$@{!@var{prefix@}*}} expansion, which expands to
+the names of all shell variables whose names begin with @var{prefix},
+is available (@pxref{Shell Parameter Expansion}).
+
+@item
+Bash has @var{indirect} variable expansion using @code{$@{!word@}}
+(@pxref{Shell Parameter Expansion}).
+
+@item
+Bash can expand positional parameters beyond @code{$9} using
+@code{$@{@var{num}@}}.
+
+@item
+The @sc{posix} @code{$()} form of command substitution
+is implemented (@pxref{Command Substitution}),
+and preferred to the Bourne shell's @code{``} (which
+is also implemented for backwards compatibility).
+
+@item
+Bash has process substitution (@pxref{Process Substitution}).
+
+@item
+Bash automatically assigns variables that provide information about the
+current user (@env{UID}, @env{EUID}, and @env{GROUPS}), the current host
+(@env{HOSTTYPE}, @env{OSTYPE}, @env{MACHTYPE}, and @env{HOSTNAME}),
+and the instance of Bash that is running (@env{BASH},
+@env{BASH_VERSION}, and @env{BASH_VERSINFO}).  @xref{Bash Variables},
+for details.
+
+@item
+The @env{IFS} variable is used to split only the results of expansion,
+not all words (@pxref{Word Splitting}).
+This closes a longstanding shell security hole.
+
+@item
+Bash implements the full set of @sc{posix} filename expansion operators,
+including @var{character classes}, @var{equivalence classes}, and
+@var{collating symbols} (@pxref{Filename Expansion}).
+
+@item
+Bash implements extended pattern matching features when the @code{extglob}
+shell option is enabled (@pxref{Pattern Matching}).
+
+@item
+It is possible to have a variable and a function with the same name;
+@code{sh} does not separate the two name spaces.
+
+@item
+Bash functions are permitted to have local variables using the
+@code{local} builtin, and thus useful recursive functions may be written
+(@pxref{Bash Builtins}).
+
+@item
+Variable assignments preceding commands affect only that command, even
+builtins and functions (@pxref{Environment}).
+In @code{sh}, all variable assignments 
+preceding commands are global unless the command is executed from the
+file system.
+
+@item
+Bash performs filename expansion on filenames specified as operands
+to input and output redirection operators (@pxref{Redirections}).
+
+@item
+Bash contains the @samp{<>} redirection operator, allowing a file to be
+opened for both reading and writing, and the @samp{&>} redirection
+operator, for directing standard output and standard error to the same
+file (@pxref{Redirections}).
+
+@item
+Bash includes the @samp{<<<} redirection operator, allowing a string to
+be used as the standard input to a command.
+
+@item
+Bash implements the @samp{[n]<&@var{word}} and @samp{[n]>&@var{word}}
+redirection operators, which move one file descriptor to another.
+
+@item
+Bash treats a number of filenames specially when they are
+used in redirection operators (@pxref{Redirections}).
+
+@item
+Bash can open network connections to arbitrary machines and services
+with the redirection operators (@pxref{Redirections}).
+
+@item
+The @code{noclobber} option is available to avoid overwriting existing
+files with output redirection (@pxref{The Set Builtin}).
+The @samp{>|} redirection operator may be used to override @code{noclobber}.
+
+@item
+The Bash @code{cd} and @code{pwd} builtins (@pxref{Bourne Shell Builtins})
+each take @option{-L} and @option{-P} options to switch between logical and
+physical modes.
+
+@item
+Bash allows a function to override a builtin with the same name, and provides
+access to that builtin's functionality within the function via the
+@code{builtin} and @code{command} builtins (@pxref{Bash Builtins}).
+
+@item
+The @code{command} builtin allows selective disabling of functions
+when command lookup is performed (@pxref{Bash Builtins}).
+
+@item
+Individual builtins may be enabled or disabled using the @code{enable}
+builtin (@pxref{Bash Builtins}).
+
+@item
+The Bash @code{exec} builtin takes additional options that allow users
+to control the contents of the environment passed to the executed
+command, and what the zeroth argument to the command is to be
+(@pxref{Bourne Shell Builtins}).
+
+@item
+Shell functions may be exported to children via the environment
+using @code{export -f} (@pxref{Shell Functions}).
+
+@item
+The Bash @code{export}, @code{readonly}, and @code{declare} builtins can
+take a @option{-f} option to act on shell functions, a @option{-p} option to
+display variables with various attributes set in a format that can be
+used as shell input, a @option{-n} option to remove various variable
+attributes, and @samp{name=value} arguments to set variable attributes
+and values simultaneously.
+
+@item
+The Bash @code{hash} builtin allows a name to be associated with
+an arbitrary filename, even when that filename cannot be found by
+searching the @env{$PATH}, using @samp{hash -p}
+(@pxref{Bourne Shell Builtins}).
+
+@item
+Bash includes a @code{help} builtin for quick reference to shell
+facilities (@pxref{Bash Builtins}).
+
+@item
+The @code{printf} builtin is available to display formatted output
+(@pxref{Bash Builtins}).
+
+@item
+The Bash @code{read} builtin (@pxref{Bash Builtins})
+will read a line ending in @samp{\} with
+the @option{-r} option, and will use the @env{REPLY} variable as a
+default if no non-option arguments are supplied.
+The Bash @code{read} builtin
+also accepts a prompt string with the @option{-p} option and will use
+Readline to obtain the line when given the @option{-e} option.
+The @code{read} builtin also has additional options to control input:
+the @option{-s} option will turn off echoing of input characters as
+they are read, the @option{-t} option will allow @code{read} to time out
+if input does not arrive within a specified number of seconds, the
+@option{-n} option will allow reading only a specified number of
+characters rather than a full line, and the @option{-d} option will read
+until a particular character rather than newline.
+
+@item
+The @code{return} builtin may be used to abort execution of scripts
+executed with the @code{.} or @code{source} builtins
+(@pxref{Bourne Shell Builtins}).
+
+@item
+Bash includes the @code{shopt} builtin, for finer control of shell
+optional capabilities (@pxref{The Shopt Builtin}), and allows these options
+to be set and unset at shell invocation (@pxref{Invoking Bash}).
+
+@item
+Bash has much more optional behavior controllable with the @code{set}
+builtin (@pxref{The Set Builtin}).
+
+@item
+The @samp{-x} (@code{xtrace}) option displays commands other than
+simple commands when performing an execution trace
+(@pxref{The Set Builtin}).
+
+@item
+The @code{test} builtin (@pxref{Bourne Shell Builtins})
+is slightly different, as it implements the @sc{posix} algorithm,
+which specifies the behavior based on the number of arguments.
+
+@item
+Bash includes the @code{caller} builtin, which displays the context of
+any active subroutine call (a shell function or a script executed with
+the @code{.} or @code{source} builtins).  This supports the bash
+debugger.
+
+@item
+The @code{trap} builtin (@pxref{Bourne Shell Builtins}) allows a
+@code{DEBUG} pseudo-signal specification, similar to @code{EXIT}.
+Commands specified with a @code{DEBUG} trap are executed before every
+simple command, @code{for} command, @code{case} command,
+@code{select} command, every arithmetic @code{for} command, and before
+the first command executes in a shell function.
+The @code{DEBUG} trap is not inherited by shell functions unless the
+function has been given the @code{trace} attribute or the
+@code{functrace} option has been enabled using the @code{shopt} builtin.
+The @code{extdebug} shell option has additional effects on the
+@code{DEBUG} trap.
+
+The @code{trap} builtin (@pxref{Bourne Shell Builtins}) allows an
+@code{ERR} pseudo-signal specification, similar to @code{EXIT} and @code{DEBUG}.
+Commands specified with an @code{ERR} trap are executed after a simple
+command fails, with a few exceptions.
+The @code{ERR} trap is not inherited by shell functions unless the
+@code{-o errtrace} option to the @code{set} builtin is enabled.
+
+The @code{trap} builtin (@pxref{Bourne Shell Builtins}) allows a
+@code{RETURN} pseudo-signal specification, similar to
+@code{EXIT} and @code{DEBUG}.
+Commands specified with an @code{RETURN} trap are executed before
+execution resumes after a shell function or a shell script executed with
+@code{.} or @code{source} returns.
+The @code{RETURN} trap is not inherited by shell functions unless the
+function has been given the @code{trace} attribute or the
+@code{functrace} option has been enabled using the @code{shopt} builtin.
+
+@item
+The Bash @code{type} builtin is more extensive and gives more information
+about the names it finds (@pxref{Bash Builtins}).
+
+@item
+The Bash @code{umask} builtin permits a @option{-p} option to cause
+the output to be displayed in the form of a @code{umask} command
+that may be reused as input (@pxref{Bourne Shell Builtins}).
+
+@item
+Bash implements a @code{csh}-like directory stack, and provides the
+@code{pushd}, @code{popd}, and @code{dirs} builtins to manipulate it
+(@pxref{The Directory Stack}).
+Bash also makes the directory stack visible as the value of the
+@env{DIRSTACK} shell variable.
+
+@item
+Bash interprets special backslash-escaped characters in the prompt
+strings when interactive (@pxref{Printing a Prompt}).
+
+@item
+The Bash restricted mode is more useful (@pxref{The Restricted Shell});
+the SVR4.2 shell restricted mode is too limited.
+
+@item
+The @code{disown} builtin can remove a job from the internal shell
+job table (@pxref{Job Control Builtins}) or suppress the sending
+of @code{SIGHUP} to a job when the shell exits as the result of a
+@code{SIGHUP}.
+
+@item
+Bash includes a number of features to support a separate debugger for
+shell scripts.
+
+@item
+The SVR4.2 shell has two privilege-related builtins
+(@code{mldmode} and @code{priv}) not present in Bash.
+
+@item
+Bash does not have the @code{stop} or @code{newgrp} builtins.
+
+@item
+Bash does not use the @env{SHACCT} variable or perform shell accounting.
+
+@item
+The SVR4.2 @code{sh} uses a @env{TIMEOUT} variable like Bash uses
+@env{TMOUT}.
+
+@end itemize
+
+@noindent
+More features unique to Bash may be found in @ref{Bash Features}.
+
+
+@appendixsec Implementation Differences From The SVR4.2 Shell
+
+Since Bash is a completely new implementation, it does not suffer from
+many of the limitations of the SVR4.2 shell.  For instance:
+
+@itemize @bullet
+
+@item
+Bash does not fork a subshell when redirecting into or out of
+a shell control structure such as  an @code{if} or @code{while}
+statement.
+
+@item
+Bash does not allow unbalanced quotes.  The SVR4.2 shell will silently
+insert a needed closing quote at @code{EOF} under certain circumstances.
+This can be the cause of some hard-to-find errors.
+
+@item
+The SVR4.2 shell uses a baroque memory management scheme based on
+trapping @code{SIGSEGV}.  If the shell is started from a process with
+@code{SIGSEGV} blocked (e.g., by using the @code{system()} C library
+function call), it misbehaves badly.
+
+@item
+In a questionable attempt at security, the SVR4.2 shell,
+when invoked without the @option{-p} option, will alter its real
+and effective @sc{uid} and @sc{gid} if they are less than some
+magic threshold value, commonly 100.
+This can lead to unexpected results.
+
+@item
+The SVR4.2 shell does not allow users to trap @code{SIGSEGV},
+@code{SIGALRM}, or @code{SIGCHLD}.
+
+@item
+The SVR4.2 shell does not allow the @env{IFS}, @env{MAILCHECK},
+@env{PATH}, @env{PS1}, or @env{PS2} variables to be unset.
+
+@item
+The SVR4.2 shell treats @samp{^} as the undocumented equivalent of
+@samp{|}.
+
+@item
+Bash allows multiple option arguments when it is invoked (@code{-x -v});
+the SVR4.2 shell allows only one option argument (@code{-xv}).  In
+fact, some versions of the shell dump core if the second argument begins
+with a @samp{-}.
+
+@item
+The SVR4.2 shell exits a script if any builtin fails; Bash exits
+a script only if one of the @sc{posix} special builtins fails, and
+only for certain failures, as enumerated in the @sc{posix} standard.
+
+@item 
+The SVR4.2 shell behaves differently when invoked as @code{jsh}
+(it turns on job control).
+@end itemize
+
+@node GNU Free Documentation License
+@appendix GNU Free Documentation License
+
+@include fdl.texi
+
+@node Indexes
+@appendix Indexes
+
+@menu
+* Builtin Index::		Index of Bash builtin commands.
+* Reserved Word Index::		Index of Bash reserved words.
+* Variable Index::		Quick reference helps you find the
+				variable you want.
+* Function Index::		Index of bindable Readline functions.
+* Concept Index::		General index for concepts described in
+				this manual.
+@end menu
+
+@node Builtin Index
+@appendixsec Index of Shell Builtin Commands
+@printindex bt
+
+@node Reserved Word Index
+@appendixsec Index of Shell Reserved Words
+@printindex rw
+
+@node Variable Index
+@appendixsec Parameter and Variable Index
+@printindex vr
+
+@node Function Index
+@appendixsec Function Index
+@printindex fn
+
+@node Concept Index
+@appendixsec Concept Index
+@printindex cp
+
+@bye
