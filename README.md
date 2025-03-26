@@ -19,5 +19,5 @@ This project is a multithreaded HTTP web server written in C++ for CSE 333 (Univ
 
 ```bash
 make
-make
 ./http333d 8000 projdocs unit_test_indices/*
+
