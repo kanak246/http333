@@ -1,0 +1,16 @@
+{
+    "name": "http333-server",
+    "build": {
+      "dockerfile": "../Dockerfile"
+    },
+    "forwardPorts": [8000],
+    "portsAttributes": {
+      "8000": {
+        "label": "HTTP 333 Server",
+        "onAutoForward": "openBrowser",
+        "visibility": "public"
+      }
+    },
+    "postCreateCommand": "make"
+  }
+  
