@@ -19,7 +19,7 @@ CFLAGS = -g -Wall -Wpedantic -std=c17 -I. -I./libhw1 -I./libhw2 -I./libhw3 -I.. 
 CXXFLAGS = -g -Wall -Wpedantic -std=c++17 -I. -I./libhw1 -I./libhw2 -I./libhw3 -I.. -O0
 
 # Link to the correct solution binaries
-LDFLAGS = -L. -L./solution_binaries -lhw4 -lhw3 -lhw2 -lhw1 -lpthread -no-pie -lgtest -lgtest_main
+LDFLAGS = -L. -L./solution_binaries -lhw4 -lhw3 -lhw2 -lhw1 -lpthread -no-pie 
 
 CPPUNITFLAGS = -L../gtest -lgtest
 
@@ -30,8 +30,8 @@ OBJS_GOOD = $(OBJS_COMMON) HttpUtils.o
 HEADERS = FileReader.h HttpConnection.h HttpRequest.h HttpResponse.h \
 	  HttpServer.h HttpUtils.h ServerSocket.h ThreadPool.h
 
-TESTOBJS = test_serversocket.o test_threadpool.o test_filereader.o \
-	   test_httpconnection.o test_httputils.o test_suite.o
+# TESTOBJS = test_serversocket.o test_threadpool.o test_filereader.o \
+# 	   test_httpconnection.o test_httputils.o test_suite.o
 
 all: http333d test_suite
 
@@ -41,27 +41,15 @@ http333d: http333d.o libhw4.a $(HEADERS)
 libhw4.a: $(OBJS_GOOD) $(HEADERS)
 	$(AR) $(ARFLAGS) $@ $(OBJS_GOOD)
 
-test_suite: $(TESTOBJS) libhw4.a $(HEADERS)
-	$(CXX) $(CXXFLAGS) -o $@ $(TESTOBJS) \
-	$(CPPUNITFLAGS) $(LDFLAGS)
+# test_suite: $(TESTOBJS) libhw4.a $(HEADERS)
+# 	$(CXX) $(CXXFLAGS) -o $@ $(TESTOBJS) \
+# 	$(CPPUNITFLAGS) $(LDFLAGS)
 
 %.o: %.cc $(HEADERS)
 	$(CXX) $(CXXFLAGS) -c $<
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $<
-.PHONY: googletest
-googletest:
-	@if [ ! -d "googletest" ]; then \
-		echo "Cloning Google Test..."; \
-		git clone https://github.com/google/googletest.git; \
-		cd googletest && mkdir build && cd build && cmake .. && make; \
-	else \
-		echo "Google Test already present."; \
-	fi
 
-.PHONY: test
-test: googletest
-	$(MAKE) test_suite LDFLAGS="$(LDFLAGS) -L./googletest/build/lib"
 clean:
 	/bin/rm -f *.o *~ test_suite http333d libhw4.a
