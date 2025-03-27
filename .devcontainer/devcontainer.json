@@ -1,7 +1,7 @@
 {
     "name": "http333-server",
     "build": {
-      "dockerfile": "../Dockerfile"
+      "dockerfile": "Dockerfile"
     },
     "forwardPorts": [8000],
     "portsAttributes": {
@@ -11,6 +11,7 @@
         "visibility": "public"
       }
     },
-    "postCreateCommand": "bash -c 'make && ./http333d 8000 projdocs unit_test_indices/*'"
-}
+    "postCreateCommand": "make",
+    "postStartCommand": "./http333d 8000 projdocs unit_test_indices/*"
+  }
   

@@ -1,19 +1,15 @@
 FROM ubuntu:22.04
 
-# Install compilers and boost
 RUN apt-get update && apt-get install -y \
     build-essential \
     g++ \
     make \
     libboost-all-dev \
+    curl \
+    git \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/src/app
+WORKDIR /workspace/app
 
 COPY . .
-
-RUN make
-
-EXPOSE 8000
-
-CMD ["./http333d", "8000"]
