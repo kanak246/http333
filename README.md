@@ -1,12 +1,12 @@
-# http333 - CSE 333 Web Server
+# http333 - Web Server
 
-This project is a multithreaded HTTP web server written in C++ for CSE 333 (University of Washington). It supports file serving and a search engine built on precomputed inverted indices.
+This project is a multithreaded HTTP web server written in C++. It supports file serving and a search engine built on precomputed inverted indices.
 
-## 🌐 Live in Codespaces
+## Live in Codespaces
 
 > This repo is fully configured to run in GitHub Codespaces with Docker!
 
-### 🚀 To run the server:
+### To run the server:
 
 1. **Click "Code" > "Codespaces" > "Create codespace on master"**
 2. Wait ~1–2 mins for setup (Docker + `make` auto-run)
@@ -15,7 +15,7 @@ This project is a multithreaded HTTP web server written in C++ for CSE 333 (Univ
 
 ---
 
-## 🛠️ Manual Run (Locally or in Codespace Terminal)
+## Manual Run (Locally or in Codespace Terminal)
 
 ```bash
 make
