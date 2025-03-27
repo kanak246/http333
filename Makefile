@@ -33,7 +33,7 @@ HEADERS = FileReader.h HttpConnection.h HttpRequest.h HttpResponse.h \
 # TESTOBJS = test_serversocket.o test_threadpool.o test_filereader.o \
 # 	   test_httpconnection.o test_httputils.o test_suite.o
 
-all: http333d test_suite
+all: http333d
 
 http333d: http333d.o libhw4.a $(HEADERS)
 	$(CXX) $(CXXFLAGS) -o $@ http333d.o libhw4.a $(LDFLAGS)
