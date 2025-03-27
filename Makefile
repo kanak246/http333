@@ -50,6 +50,18 @@ test_suite: $(TESTOBJS) libhw4.a $(HEADERS)
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $<
+.PHONY: googletest
+googletest:
+	@if [ ! -d "googletest" ]; then \
+		echo "Cloning Google Test..."; \
+		git clone https://github.com/google/googletest.git; \
+		cd googletest && mkdir build && cd build && cmake .. && make; \
+	else \
+		echo "Google Test already present."; \
+	fi
 
+.PHONY: test
+test: googletest
+	$(MAKE) test_suite LDFLAGS="$(LDFLAGS) -L./googletest/build/lib"
 clean:
 	/bin/rm -f *.o *~ test_suite http333d libhw4.a
