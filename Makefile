@@ -19,7 +19,7 @@ CFLAGS = -g -Wall -Wpedantic -std=c17 -I. -I./libhw1 -I./libhw2 -I./libhw3 -I.. 
 CXXFLAGS = -g -Wall -Wpedantic -std=c++17 -I. -I./libhw1 -I./libhw2 -I./libhw3 -I.. -O0
 
 # Link to the correct solution binaries
-LDFLAGS = -L. -L./solution_binaries -lhw4 -lhw3 -lhw2 -lhw1 -lpthread
+LDFLAGS = -L. -L./solution_binaries -lhw4 -lhw3 -lhw2 -lhw1 -lpthread -no-pie
 
 CPPUNITFLAGS = -L../gtest -lgtest
 
