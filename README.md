@@ -29,7 +29,9 @@ If you prefer to run the project manually:
 make 
 ./http333d 8000 projdocs unit_test_indices/*
 8000 – The port number the server will listen on (might need to make it public)
+
 projdocs – The directory containing static files and index files
+
 unit_test_indices/* – The precomputed search indices used for querying
 To search for words:
 
